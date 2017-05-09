@@ -64,5 +64,10 @@ int Simbox::readInput(string filename){
     cout << "charge is " << charge[i] << endl;
   }
   cout << numObjs << endl;
-  return 0;
+  if (numObjs == objIndex){
+    return 0; //whee everythig's good
+  }
+  else{
+    return 2; //mismatch between declared number of objects and actual number
+  }
 }
