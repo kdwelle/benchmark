@@ -1,4 +1,5 @@
 #include "simbox.cpp"
+#include "noPeriodicity.cpp"
 int main(int argc, char *argv[]){
 //delta E simulation
 //************************* Set Parameters **************************************

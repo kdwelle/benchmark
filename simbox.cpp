@@ -12,6 +12,7 @@ using namespace std;
 Simbox::Simbox(int sideLength, int SLZ, string filename): sideLength(sideLength), SLZ(SLZ)
 {
   readInput(filename);
+  initialize();
 }
 
 
@@ -70,4 +71,9 @@ int Simbox::readInput(string filename){
   else{
     return 2; //mismatch between declared number of objects and actual number
   }
+}
+
+void Simbox::initialize(){
+// need to set up drpair
+
 }
