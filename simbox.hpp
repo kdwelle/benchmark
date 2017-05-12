@@ -13,6 +13,7 @@ class Simbox{
   public:
     Simbox(int, int, std::string);
     void translate_particle(int, float, float, float); //move particle by x,y,z
+    void set_position(int, float, float, float);
     void change_charge(int,float);
     void set_charge(int,float);
 

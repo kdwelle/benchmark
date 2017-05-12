@@ -7,7 +7,7 @@ double get_energy(const Simbox& config){
   double eng=0.0;
   double ftemp;
   float q1,q2;
-  int x1,y1,z1;
+  float x1,y1,z1;
   double rEnergy = 0.0;
   double r_ij;
 

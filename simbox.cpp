@@ -175,6 +175,15 @@ void Simbox::translate_particle(int index, float dx, float dy, float dz){
   get_drpair1(index);
 }
 
+void Simbox::set_position(int index, float x, float y, float z){
+  // move particle index to x,y,z
+  position[index][0] = x;
+  position[index][1] = y;
+  position[index][2] = z;
+
+  get_drpair1(index);
+}
+
 void Simbox::change_charge(int index, float dq){
   charge[index] += dq;
 }

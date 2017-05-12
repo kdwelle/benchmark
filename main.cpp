@@ -21,7 +21,12 @@ int main(int argc, char *argv[]){
   Simbox sample(sideLength, SLZ, "input.in");
   cout << get_energy(sample) << endl;
 
-  
+  for (int i=0; i<100; ++i){
+    double z = i*1.0/SLZ;
+    cout << z << " ";
+    sample.set_position(0,0,0,z);
+    cout << get_energy(sample) << endl;
+  }
 
 
 }
