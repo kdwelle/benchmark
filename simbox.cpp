@@ -1,9 +1,12 @@
 
 #include <string>
+#include <math.h>
+#include <stdlib.h>
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <cstring>
+#include <limits>
 #include "simbox.hpp"
 
 using namespace std;
@@ -11,10 +14,10 @@ using namespace std;
 
 Simbox::Simbox(int sideLength, int SLZ, string filename): sideLength(sideLength), SLZ(SLZ)
 {
+  gam = 1;
   readInput(filename);
   initialize();
 }
-
 
 int Simbox::readInput(string filename){
   ifstream fin;
@@ -25,7 +28,7 @@ int Simbox::readInput(string filename){
   //read first line (how many objects)
   char buf[100];
   fin.getline(buf, 100);
-  int numObjs = atoi(strtok(buf, " "));
+  numObjs = atoi(strtok(buf, " "));
   // read rest of the file
 
   vector<float> itemp;
@@ -74,6 +77,91 @@ int Simbox::readInput(string filename){
 }
 
 void Simbox::initialize(){
-// need to set up drpair
+  inf = std::numeric_limits<double>::infinity();
 
+  numPairs = 0;
+  vector<int> pairindTemp;
+  vector<int> pairind2Temp(numObjs);
+  pairind2.reserve(numObjs);
+  for(int i = 0; i < numObjs; i++){ // Build list of ion pairs
+    pairind2.push_back(pairind2Temp);
+    for(int j = i; j < numObjs; j++){
+      pairindTemp.clear();
+      pairindTemp.push_back(i);
+      pairindTemp.push_back(j);
+      pairind.push_back(pairindTemp);
+      pairind2[i][j] = numPairs;
+      numPairs++;
+    }
+  }
+
+  for(int i = 0 ; i < numObjs-1 ; i++){ // mirror pairind2
+    for(int j = i+1 ; j < numObjs ; j++){
+      pairind2[j][i] = pairind2[i][j];
+    }
+  }
+
+  position.reserve(numObjs);
+  vector<double> posTemp(3);
+
+  drpair.reserve(numPairs); //initialize drpairs
+  for (int i=0; i<numPairs; ++i){
+    drpair.push_back(posTemp);
+  }
+
+  get_drpair0();
+
+}
+
+void Simbox::get_drpair0(){
+  vector<double> dr(3);
+  int ind1,ind2;
+  for(int i = 0 ; i < numPairs ; i++){
+    ind1=pairind[i][0];
+    ind2=pairind[i][1];
+    if (charge[ind1] && charge[ind2]){ //if they both have charge
+      for(int k = 0 ; k < 3 ; k++){
+        dr[k]=position[ind1][k]-position[ind2][k];
+        if(k<2){
+        	if(dr[k] > sideLength/2.) dr[k]-=sideLength;
+        	if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
+        }else{ //nearest neighbor convention for z-direction
+          if(dr[k] > SLZ) dr[k]-=SLZ*2;
+          if(dr[k] < -SLZ) dr[k]+=SLZ*2;
+        }
+      }
+    }else{ //otherwise they are "infinitely far apart"
+      for(int k = 0 ; k < 3 ; k++){
+        dr[k] = inf;
+      }
+    }
+    drpair[i] = dr;
+    cout << dr[0] << " " << dr[1] << " " << dr[2] << " " << endl;
+  }
+}
+
+void Simbox::get_drpair1(int ind1){
+
+  vector<double> dr(3);
+  int pairIndex;
+  for(int ind2 = 0 ; ind2 < numObjs ; ind2++){
+    pairIndex=pairind2[ind1][ind2];
+    if (charge[ind1] && charge[ind2]){ //if they both have charge
+      for(int k = 0 ; k < 3 ; k++){
+      	dr[k]=position[ind1][k]-position[ind2][k];
+      	if(k<2){ //nearest neighbor convention
+      	  if(dr[k] > sideLength/2.) dr[k]-=sideLength;
+      	  if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
+      	}else{ //nearest neighbor convention for z-direction
+          if(dr[k] > SLZ) dr[k]-=SLZ*2;
+          if(dr[k] < -SLZ) dr[k]+=SLZ*2;
+        }
+      }
+    }else{
+      for(int k = 0 ; k < 3 ; k++){
+        dr[k] = inf;
+      }
+    }
+    drpair[pairIndex]=dr;
+  }
 }

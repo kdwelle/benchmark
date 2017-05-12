@@ -1,8 +1,6 @@
 
 #include <math.h>
 
-#include "simbox.hpp"
-
 using namespace std;
 
 double get_energy(const Simbox& config){
@@ -14,9 +12,9 @@ double get_energy(const Simbox& config){
   double r_ij;
 
   for (int i=0; i<config.numPairs; ++i){
-    q1=config.charge[pairind[i][0]]; //charge of the ions
-    q2=config.charge[pairind[i][1]];
-    if(int(q1) && int(q2)){
+    q1=config.charge[config.pairind[i][0]]; //charge of the ions
+    q2=config.charge[config.pairind[i][1]];
+    if(q1 && q2){
       x1 = config.drpair[i][0]; //non-periodic distance
       y1 = config.drpair[i][1];
       z1 = config.drpair[i][2];
