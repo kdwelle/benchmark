@@ -165,3 +165,20 @@ void Simbox::get_drpair1(int ind1){
     drpair[pairIndex]=dr;
   }
 }
+
+void Simbox::translate_particle(int index, float dx, float dy, float dz){
+  // translate particle index by dx,dy,dz
+  position[index][0] += dx;
+  position[index][1] += dy;
+  position[index][2] += dz;
+
+  get_drpair1(index);
+}
+
+void Simbox::change_charge(int index, float dq){
+  charge[index] += dq;
+}
+
+void Simbox::set_charge(int index, float newq){
+  charge[index] = newq;
+}

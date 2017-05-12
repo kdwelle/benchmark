@@ -12,6 +12,10 @@ class Simbox{
 */
   public:
     Simbox(int, int, std::string);
+    void translate_particle(int, float, float, float); //move particle by x,y,z
+    void change_charge(int,float);
+    void set_charge(int,float);
+
     friend double get_energy(const Simbox&);
     friend double get_mad_potential(const Simbox&, int);
 
@@ -29,7 +33,7 @@ class Simbox{
 
     double inf;              // infinity
 
-    std::vector< std::vector<float> >  position;
+    std::vector< std::vector<float> >  position;   // positoin[ionIndex][x/y/z] = position in x/y/z
     std::vector<float>                 charge;
     std::vector< std::vector<double> > drpair;     // drpair[ionPairIndex][x/y/z] = 3-D distance between ions in ion pair
     std::vector< std::vector<int> >    pairind;    // pairind[ionPairIndex][0/1] = index of 1st/2nd ion in pair

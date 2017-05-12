@@ -1,5 +1,6 @@
 #include "simbox.cpp"
 #include "noPeriodicity.cpp"
+#include "sweepLtR.cpp"
 
 
 int main(int argc, char *argv[]){
@@ -19,5 +20,8 @@ int main(int argc, char *argv[]){
   // Make a lattice object:
   Simbox sample(sideLength, SLZ, "input.in");
   cout << get_energy(sample) << endl;
+
+  
+
 
 }
