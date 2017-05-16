@@ -134,14 +134,11 @@ void Simbox::get_drpair0(){
     if (charge[ind1] && charge[ind2]){ //if they both have charge
       for(int k = 0 ; k < 3 ; k++){
         dr[k]=position[ind1][k]-position[ind2][k];
-        if(k<2){
-        	if(dr[k] > sideLength/2.) dr[k]-=sideLength;
-        	if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
-        }else{ //nearest neighbor convention for z-direction
-          if(dr[k] > SLZ) dr[k]-=SLZ*2;
-          if(dr[k] < -SLZ) dr[k]+=SLZ*2;
-        }
       }
+      //   if(k<2){
+      //   	if(dr[k] > sideLength/2.) dr[k]-=sideLength;
+      //   	if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
+      // }
     }else{ //otherwise they are "infinitely far apart"
       for(int k = 0 ; k < 3 ; k++){
         dr[k] = inf;
@@ -161,13 +158,10 @@ void Simbox::get_drpair1(int ind1){
     if (charge[ind1] && charge[ind2]){ //if they both have charge
       for(int k = 0 ; k < 3 ; k++){
       	dr[k]=position[ind1][k]-position[ind2][k];
-      	if(k<2){ //nearest neighbor convention
-      	  if(dr[k] > sideLength/2.) dr[k]-=sideLength;
-      	  if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
-      	}else{ //nearest neighbor convention for z-direction
-          if(dr[k] > SLZ) dr[k]-=SLZ*2;
-          if(dr[k] < -SLZ) dr[k]+=SLZ*2;
-        }
+      	// if(k<2){ //nearest neighbor convention
+      	//   if(dr[k] > sideLength/2.) dr[k]-=sideLength;
+      	//   if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
+        // }
       }
     }else{
       for(int k = 0 ; k < 3 ; k++){
@@ -184,12 +178,12 @@ float Simbox::get_image(float z){  //get the location of the corresponding image
     return -1; //ghost coordinates
   }
   if (z < SLZ){ //image charge on left electrode
-    int dist = z-zbegin;
-    image = zbegin - dist - 1;
+    float dist = z-zbegin;
+    image = zbegin - dist;
   }
   else{ //right electrode
-    int dist = zend - z;
-    image = zend + dist - 1;
+    float dist = zend - z;
+    image = zend + dist;
   }
   return image;
 }
@@ -201,6 +195,16 @@ void Simbox::translate_particle(int index, float dx, float dy, float dz){
   position[index][2] += dz;
 
   get_drpair1(index);
+
+  if (imageChargesExist){
+    position[index+1][0] += dx;
+    position[index+1][1] += dy;
+    position[index+1][2] = get_image(position[index][2]);
+
+    get_drpair1(index+1);
+  }
+
+
 }
 
 void Simbox::set_position(int index, float x, float y, float z){
@@ -210,12 +214,26 @@ void Simbox::set_position(int index, float x, float y, float z){
   position[index][2] = z;
 
   get_drpair1(index);
+
+  if (imageChargesExist){
+    position[index+1][0] = x;
+    position[index+1][1] = y;
+    position[index+1][2] = get_image(z);
+
+    get_drpair1(index+1);
+  }
 }
 
 void Simbox::change_charge(int index, float dq){
   charge[index] += dq;
+  if (imageChargesExist){
+    charge[index+1] -= dq;
+  }
 }
 
 void Simbox::set_charge(int index, float newq){
   charge[index] = newq;
+  if (imageChargesExist){
+    charge[index+1] = -1.0*newq;
+  }
 }
