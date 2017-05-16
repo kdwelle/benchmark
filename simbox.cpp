@@ -12,9 +12,11 @@
 using namespace std;
 
 
-Simbox::Simbox(int sideLength, int SLZ, string filename): sideLength(sideLength), SLZ(SLZ)
+Simbox::Simbox(int sideLength, int SLZ, bool imageChargesExist, string filename): sideLength(sideLength), SLZ(SLZ), imageChargesExist(imageChargesExist)
 {
   gam = 1;
+  zbegin = (imageChargesExist) ? SLZ/2.0 : 0;
+  zend = (imageChargesExist) ? 3.0*SLZ/2.0 : SLZ;
   readInput(filename);
   initialize();
 }
@@ -28,9 +30,10 @@ int Simbox::readInput(string filename){
   //read first line (how many objects)
   char buf[100];
   fin.getline(buf, 100);
-  numObjs = atoi(strtok(buf, " "));
-  // read rest of the file
+  int mult = (imageChargesExist) ? 2 : 1; //if image charges, mult is 2
+  numObjs = atoi(strtok(buf, " ")) * mult;
 
+  // read rest of the file
   vector<float> itemp;
   itemp.resize(3);
   position.resize(numObjs,itemp);
@@ -54,19 +57,28 @@ int Simbox::readInput(string filename){
         if (!token[n]) break; // no more tokens
       }
 
-    position[objIndex][0] = atof(token[1]);  // x-position
-    position[objIndex][1] = atof(token[2]);  // y-position
-    position[objIndex][2] = atof(token[3]);  // z-position
-    charge[objIndex] = atof(token[4]);       //charge
+      position[objIndex][0] = atof(token[1]);  // x-position
+      position[objIndex][1] = atof(token[2]);  // y-position
+      position[objIndex][2] = atof(token[3]) + zbegin;  // z-position
+      charge[objIndex] = atof(token[4]);       //charge
 
-    objIndex++;
+      objIndex++;
+
+      if (imageChargesExist){
+        position[objIndex][0] = atof(token[1]);  // x-position
+        position[objIndex][1] = atof(token[2]);  // y-position
+        position[objIndex][2] = get_image(atof(token[3]) + zbegin);  // z-position
+        charge[objIndex] = -1.0*atof(token[4]);       //charge
+        objIndex++;
+      }
     }
   }
-
+  // debugging
   for(int i=0; i<numObjs; ++i){
     cout << position[i][0] << " " << position[i][1] << " " << position[i][2] << endl;
     cout << "charge is " << charge[i] << endl;
   }
+
   cout << numObjs << endl;
   if (numObjs == objIndex){
     return 0; //whee everythig's good
@@ -164,6 +176,22 @@ void Simbox::get_drpair1(int ind1){
     }
     drpair[pairIndex]=dr;
   }
+}
+
+float Simbox::get_image(float z){  //get the location of the corresponding image charge
+  float image;
+  if (z == -1){
+    return -1; //ghost coordinates
+  }
+  if (z < SLZ){ //image charge on left electrode
+    int dist = z-zbegin;
+    image = zbegin - dist - 1;
+  }
+  else{ //right electrode
+    int dist = zend - z;
+    image = zend + dist - 1;
+  }
+  return image;
 }
 
 void Simbox::translate_particle(int index, float dx, float dy, float dz){

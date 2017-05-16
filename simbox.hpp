@@ -11,7 +11,7 @@ class Simbox{
    variablesUseCamelCase
 */
   public:
-    Simbox(int, int, std::string);
+    Simbox(int, int, bool, std::string);
     void translate_particle(int, float, float, float); //move particle by x,y,z
     void set_position(int, float, float, float);
     void change_charge(int,float);
@@ -21,13 +21,17 @@ class Simbox{
     friend double get_mad_potential(const Simbox&, int);
 
   private:
-    int  readInput(std::string);
-    void initialize();
-    void get_drpair0();
-    void get_drpair1(int);
+    int   readInput(std::string);
+    void  initialize();
+    void  get_drpair0();
+    void  get_drpair1(int);
+    float get_image(float);
 
     int    sideLength;
     int    SLZ;
+    bool   imageChargesExist;
+    float  zbegin;
+    float  zend;
     int    numObjs;
     int    numPairs;
     float  gam;
