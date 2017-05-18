@@ -12,7 +12,7 @@
 using namespace std;
 
 
-Simbox::Simbox(int sideLength, int SLZ, bool imageChargesExist, string filename): sideLength(sideLength), SLZ(SLZ), imageChargesExist(imageChargesExist)
+Simbox::Simbox(int sideLength, int SLZ, int imageChargesExist, string filename): sideLength(sideLength), SLZ(SLZ), imageChargesExist(imageChargesExist)
 {
   gam = 1;
   zbegin = (imageChargesExist) ? SLZ/2.0 : 0;
@@ -30,8 +30,7 @@ int Simbox::readInput(string filename){
   //read first line (how many objects)
   char buf[100];
   fin.getline(buf, 100);
-  int mult = (imageChargesExist) ? 2 : 1; //if image charges, mult is 2
-  numObjs = atoi(strtok(buf, " ")) * mult;
+  numObjs = atoi(strtok(buf, " ")) * (1+imageChargesExist);
 
   // read rest of the file
   vector<float> itemp;
@@ -64,19 +63,19 @@ int Simbox::readInput(string filename){
 
       objIndex++;
 
-      if (imageChargesExist){
+      for (int i=0; i<imageChargesExist; ++i){
+        cout << "objIndex is: " << objIndex << " i is: " << i << endl;
         position[objIndex][0] = atof(token[1]);  // x-position
         position[objIndex][1] = atof(token[2]);  // y-position
-        position[objIndex][2] = get_image(atof(token[3]) + zbegin);  // z-position
-        charge[objIndex] = -1.0*atof(token[4]);       //charge
+        position[objIndex][2] = get_image(atof(token[3]) + zbegin, i+1);  // z-position
+        charge[objIndex] = get_image_charge(atof(token[4]), i+1);       //charge
         objIndex++;
       }
     }
   }
   // debugging
   for(int i=0; i<numObjs; ++i){
-    cout << position[i][0] << " " << position[i][1] << " " << position[i][2] << endl;
-    cout << "charge is " << charge[i] << endl;
+    cout << position[i][0] << " " << position[i][1] << " " << position[i][2] <<  " " << charge[i] << endl;
   }
 
   cout << numObjs << endl;
@@ -86,6 +85,7 @@ int Simbox::readInput(string filename){
   else{
     return 2; //mismatch between declared number of objects and actual number
   }
+
 }
 
 void Simbox::initialize(){
@@ -172,20 +172,45 @@ void Simbox::get_drpair1(int ind1){
   }
 }
 
-float Simbox::get_image(float z){  //get the location of the corresponding image charge
+float Simbox::get_image(float z, int order){  //get the location of the corresponding image charge
   float image;
+  int pairNum;
+  int repeatDist;
+
   if (z == -1){
     return -1; //ghost coordinates
   }
+  pairNum = (order/2)+1;
+
   if (z < SLZ){ //image charge on left electrode
+
+    repeatDist = pow(-1,pairNum)*(pairNum/2); //number of periodic distances away
     float dist = z-zbegin;
     image = zbegin - dist;
   }
+
   else{ //right electrode
+    repeatDist = -1*pow(-1,pairNum)*(pairNum/2);
     float dist = zend - z;
     image = zend + dist;
   }
-  return image;
+
+  int decider = (order+1)/2;
+  if ( decider % 2 ){  // order+1/2 is odd -- charge and position of 1st image
+    return image + repeatDist*(SLZ*2);
+  }
+  return z + repeatDist*(SLZ*2); //else
+
+
+}
+
+float Simbox::get_image_charge(float charge, int order){
+  int decider = (order+1)/2;
+  if ( decider % 2 ){  // order+1/2 is odd -- charge and position of 1st image
+    return -1.0*charge;
+  }
+  return charge;
+
 }
 
 void Simbox::translate_particle(int index, float dx, float dy, float dz){
@@ -196,15 +221,15 @@ void Simbox::translate_particle(int index, float dx, float dy, float dz){
 
   get_drpair1(index);
 
-  if (imageChargesExist){
-    position[index+1][0] += dx;
-    position[index+1][1] += dy;
-    position[index+1][2] = get_image(position[index][2]);
 
-    get_drpair1(index+1);
+  for (int i=0; i<imageChargesExist; ++i){
+    int j=i+1;
+    position[index+j][0] += dx;
+    position[index+j][1] += dy;
+    position[index+j][2] = get_image(position[index][2],j);
+
+    get_drpair1(index+j);
   }
-
-
 }
 
 void Simbox::set_position(int index, float x, float y, float z){
@@ -215,12 +240,13 @@ void Simbox::set_position(int index, float x, float y, float z){
 
   get_drpair1(index);
 
-  if (imageChargesExist){
-    position[index+1][0] = x;
-    position[index+1][1] = y;
-    position[index+1][2] = get_image(z);
+  for (int i=0; i<imageChargesExist; ++i){
+    int j=i+1;
+    position[index+j][0] = x;
+    position[index+j][1] = y;
+    position[index+j][2] = get_image(z,j);
 
-    get_drpair1(index+1);
+    get_drpair1(index+j);
   }
 }
 
