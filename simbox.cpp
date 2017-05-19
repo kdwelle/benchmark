@@ -12,11 +12,11 @@
 using namespace std;
 
 
-Simbox::Simbox(int sideLength, int SLZ, int imageChargesExist, string filename): sideLength(sideLength), SLZ(SLZ), imageChargesExist(imageChargesExist)
+Simbox::Simbox(int sideLength, int SLZ, int numImageReflections, string filename): sideLength(sideLength), SLZ(SLZ), numImageReflections(numImageReflections)
 {
   gam = 1;
-  zbegin = (imageChargesExist) ? SLZ/2.0 : 0;
-  zend = (imageChargesExist) ? 3.0*SLZ/2.0 : SLZ;
+  zbegin = (numImageReflections) ? SLZ/2.0 : 0;
+  zend = (numImageReflections) ? 3.0*SLZ/2.0 : SLZ;
   readInput(filename);
   initialize();
 }
@@ -27,10 +27,11 @@ int Simbox::readInput(string filename){
   if (!fin.good()){
     return 1; // exit if file not found
   }
-  //read first line (how many objects)
+  //read first line (how many real objects)
   char buf[100];
   fin.getline(buf, 100);
-  numObjs = atoi(strtok(buf, " ")) * (1+imageChargesExist);
+  numReal = atoi(strtok(buf, " "));
+  numObjs = numReal * (1+numImageReflections);
 
   // read rest of the file
   vector<float> itemp;
@@ -61,9 +62,11 @@ int Simbox::readInput(string filename){
       position[objIndex][2] = atof(token[3]) + zbegin;  // z-position
       charge[objIndex] = atof(token[4]);       //charge
 
+      realCharges.push_back(objIndex); //this is a real charge, add to list;
+
       objIndex++;
 
-      for (int i=0; i<imageChargesExist; ++i){
+      for (int i=0; i<numImageReflections; ++i){
         cout << "objIndex is: " << objIndex << " i is: " << i << endl;
         position[objIndex][0] = atof(token[1]);  // x-position
         position[objIndex][1] = atof(token[2]);  // y-position
@@ -145,7 +148,7 @@ void Simbox::get_drpair0(){
       }
     }
     drpair[i] = dr;
-    cout << dr[0] << " " << dr[1] << " " << dr[2] << " " << endl;
+    // cout << dr[0] << " " << dr[1] << " " << dr[2] << " " << endl;
   }
 }
 
@@ -222,7 +225,7 @@ void Simbox::translate_particle(int index, float dx, float dy, float dz){
   get_drpair1(index);
 
 
-  for (int i=0; i<imageChargesExist; ++i){
+  for (int i=0; i<numImageReflections; ++i){
     int j=i+1;
     position[index+j][0] += dx;
     position[index+j][1] += dy;
@@ -240,7 +243,7 @@ void Simbox::set_position(int index, float x, float y, float z){
 
   get_drpair1(index);
 
-  for (int i=0; i<imageChargesExist; ++i){
+  for (int i=0; i<numImageReflections; ++i){
     int j=i+1;
     position[index+j][0] = x;
     position[index+j][1] = y;
@@ -252,14 +255,14 @@ void Simbox::set_position(int index, float x, float y, float z){
 
 void Simbox::change_charge(int index, float dq){
   charge[index] += dq;
-  if (imageChargesExist){
+  if (numImageReflections){
     charge[index+1] -= dq;
   }
 }
 
 void Simbox::set_charge(int index, float newq){
   charge[index] = newq;
-  if (imageChargesExist){
+  if (numImageReflections){
     charge[index+1] = -1.0*newq;
   }
 }

@@ -30,15 +30,18 @@ class Simbox{
 
     int    sideLength;
     int    SLZ;
-    int   imageChargesExist;
+    int    numImageReflections;
     float  zbegin;
     float  zend;
     int    numObjs;
+    int    numReal;
     int    numPairs;
     float  gam;
 
     double inf;              // infinity
 
+
+    std::vector<int>                   realCharges; // a list of all the non-image charges in the syste, by index
     std::vector< std::vector<float> >  position;   // positoin[ionIndex][x/y/z] = position in x/y/z
     std::vector<float>                 charge;
     std::vector< std::vector<double> > drpair;     // drpair[ionPairIndex][x/y/z] = 3-D distance between ions in ion pair
