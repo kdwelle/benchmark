@@ -15,8 +15,8 @@ using namespace std;
 Simbox::Simbox(int sideLength, int SLZ, int numImageReflections, string filename): sideLength(sideLength), SLZ(SLZ), numImageReflections(numImageReflections)
 {
   gam = 1;
-  zbegin = (numImageReflections) ? SLZ/2.0 : 0;
-  zend = (numImageReflections) ? 3.0*SLZ/2.0 : SLZ;
+  zbegin = 0;
+  zend = SLZ;
   readInput(filename);
   initialize();
 }
@@ -67,7 +67,6 @@ int Simbox::readInput(string filename){
       objIndex++;
 
       for (int i=0; i<numImageReflections; ++i){
-        cout << "objIndex is: " << objIndex << " i is: " << i << endl;
         position[objIndex][0] = atof(token[1]);  // x-position
         position[objIndex][1] = atof(token[2]);  // y-position
         position[objIndex][2] = get_image(atof(token[3]) + zbegin, i+1);  // z-position
@@ -77,11 +76,17 @@ int Simbox::readInput(string filename){
     }
   }
   // debugging
-  for(int i=0; i<numObjs; ++i){
-    cout << position[i][0] << " " << position[i][1] << " " << position[i][2] <<  " " << charge[i] << endl;
-  }
+  // cout << "coordinates of all" << endl;
+  // for(int i=0; i<numObjs; ++i){
+  //   cout << i << " " << position[i][0] << " " << position[i][1] << " " << position[i][2] <<  " " << charge[i] << endl;
+  // }
+  // cout << "coordinates of real" << endl;
+  // for(int i=0; i<numReal; ++i){
+  //   int index = realCharges[i];
+  //   cout << i << " " << index << " " << position[index][0] << " " << position[index][1] << " " << position[index][2] <<  " " << charge[index] << endl;
+  // }
+  // cout << numObjs << endl;
 
-  cout << numObjs << endl;
   if (numObjs == objIndex){
     return 0; //whee everythig's good
   }
@@ -185,7 +190,7 @@ float Simbox::get_image(float z, int order){  //get the location of the correspo
   }
   pairNum = (order/2)+1;
 
-  if (z < SLZ){ //image charge on left electrode
+  if (z < SLZ/2){ //image charge on left electrode
 
     repeatDist = pow(-1,pairNum)*(pairNum/2); //number of periodic distances away
     float dist = z-zbegin;
@@ -264,5 +269,12 @@ void Simbox::set_charge(int index, float newq){
   charge[index] = newq;
   if (numImageReflections){
     charge[index+1] = -1.0*newq;
+  }
+}
+
+void Simbox::output_analysis(){
+  // index x y z charge
+  for(int i=0; i<numObjs; ++i){
+    cout << i << " " << position[i][0] << " " << position[i][1] << " " << position[i][2] <<  " " << charge[i] << endl;
   }
 }

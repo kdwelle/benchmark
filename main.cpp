@@ -22,18 +22,19 @@ int main(int argc, char *argv[]){
 
   cout << "image charges: " << imageChargesExist << endl;
 
-  float zbegin = (imageChargesExist) ? SLZ/2.0 : 0;
+  float zbegin = 0;
 
   // Make a lattice object:
   Simbox sample(sideLength, SLZ, imageChargesExist, "input.in");
   cout << get_energy(sample) << endl;
 
-  for (int i=0; i<99; ++i){
-    double z = zbegin+0.1+(i*1.0/SLZ);
+  sample.output_analysis();
+  for (int i=0; i<97; ++i){
+    double z = zbegin+0.2+(i*1.0/SLZ);
     cout << z << " ";
     sample.set_position(0,0,0,z);
     cout << get_energy(sample) << endl;
   }
-
+  sample.output_analysis();
 
 }

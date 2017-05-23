@@ -16,6 +16,7 @@ class Simbox{
     void set_position(int, float, float, float);
     void change_charge(int,float);
     void set_charge(int,float);
+    void output_analysis();
 
     friend double get_energy(const Simbox&);
     friend double get_mad_potential(const Simbox&, int);
@@ -30,11 +31,11 @@ class Simbox{
 
     int    sideLength;
     int    SLZ;
-    int    numImageReflections;
+    int    numImageReflections;  // how many image charges to include (0 is none, 1 is as many image charges as real charges)
     float  zbegin;
     float  zend;
-    int    numObjs;
-    int    numReal;
+    int    numObjs;  // total number of objects in the simulation (including image charges)
+    int    numReal;  // total number of "real" (i.e. non-image) charge in the simulation
     int    numPairs;
     float  gam;
 
@@ -42,7 +43,7 @@ class Simbox{
 
 
     std::vector<int>                   realCharges; // a list of all the non-image charges in the syste, by index
-    std::vector< std::vector<float> >  position;   // positoin[ionIndex][x/y/z] = position in x/y/z
+    std::vector< std::vector<float> >  position;    // positoin[ionIndex][x/y/z] = position in x/y/z
     std::vector<float>                 charge;
     std::vector< std::vector<double> > drpair;     // drpair[ionPairIndex][x/y/z] = 3-D distance between ions in ion pair
     std::vector< std::vector<int> >    pairind;    // pairind[ionPairIndex][0/1] = index of 1st/2nd ion in pair
