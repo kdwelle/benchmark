@@ -3,19 +3,19 @@
 
 using namespace std;
 
-double get_energy(const Simbox& config){
+double get_energy(const Simbox& config, const PeriodicImages& imageItem){
   double eng=0.0;
   double ftemp;
-  
+
   for(int i=0; i<config.numReal; ++i){ //sum over madeleung potentials for real ions
     int ionIndex = config.realCharges[i];
-    ftemp = get_mad_potential(config,ionIndex)*config.charge[ionIndex];
+    ftemp = get_mad_potential(config,ionIndex,imageItem)*config.charge[ionIndex];
     eng += ftemp;
   }
   return eng/2;
 }
 
-double get_mad_potential(const Simbox& config, int ionIndex){
+double get_mad_potential(const Simbox& config, int ionIndex, const PeriodicImages&){
   double pot=0.0;
   double ftemp;
   float q1,q2,q;
@@ -49,4 +49,10 @@ double get_mad_potential(const Simbox& config, int ionIndex){
   }
   pot = rEnergy/config.gam;
   return pot;
+}
+
+PeriodicImages get_images(double, double){
+  int dimen = 0;  // this doesn't actually need an images object, but for the sake of consistency it gets a basically empty one
+  PeriodicImages imageItem(dimen);
+  return imageItem;
 }

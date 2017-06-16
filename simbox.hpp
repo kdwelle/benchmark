@@ -18,8 +18,8 @@ class Simbox{
     void set_charge(int,float);
     void output_analysis();
 
-    friend double get_energy(const Simbox&);
-    friend double get_mad_potential(const Simbox&, int);
+    friend double get_energy(const Simbox&, const PeriodicImages&);
+    friend double get_mad_potential(const Simbox&, int, const PeriodicImages&);
 
   private:
     int   readInput(std::string);
@@ -40,11 +40,6 @@ class Simbox{
     float  gam;
 
     double inf;                          // infinity
-    const static int   m_max = 20;       // cells in fourier space
-    const static int   n_max = 1;        // cells in real
-    int                rCount;           // total number of real periodic images
-    int                ftCount;          // total number of fourier space periodic images
-    // double             alpha;            // width of the gausian distribution for ewald summation
     int                rsCuttoff;        // real space cutoff radius
 
 
@@ -54,10 +49,6 @@ class Simbox{
     std::vector< std::vector<double> > drpair;     // drpair[ionPairIndex][x/y/z] = 3-D distance between ions in ion pair
     std::vector< std::vector<int> >    pairind;    // pairind[ionPairIndex][0/1] = index of 1st/2nd ion in pair
     std::vector< std::vector<int> >    pairind2;   // pairind2[ionIndex 1][ionIndex 2] = ionPairIndex
-
-    std::vector< std::vector<float> >  fspace;           //reciprical (fourier) space repeating images
-    std::vector< std::vector<int> >    rspace;           //real space repeating images
-
 };
 
 #endif

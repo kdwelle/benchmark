@@ -15,7 +15,7 @@ using namespace std;
 Simbox::Simbox(int sideLength, int SLZ, int numImageReflections, string filename): sideLength(sideLength), SLZ(SLZ), numImageReflections(numImageReflections)
 {
   gam = 1;
-  rsCuttoff = 2*0.6*max(sideLength,SLZ);
+  rsCuttoff = 0.6*max(sideLength,SLZ);
   zbegin = 0;
   zend = SLZ;
   readInput(filename);
@@ -137,31 +137,6 @@ void Simbox::initialize(){
 
   get_drpair0();
 
-  //initialize the real and fourier space periodic image vectors
-  ftCount = (m_max*2+1)*(m_max*2+1); //total number of fourier space periodic images
-  fspace.resize(ftCount);  //fourier space
-  int count = 0;
-  double kx = 2*M_PI/double(sideLength); //lattice vector dimensions
-  for (int i = -m_max; i <= m_max; ++i){
-    for (int j = -m_max; j <= m_max; ++j){
-      fspace[count].resize(2); // {0,0,0}
-      fspace[count][0]=i*kx;
-      fspace[count][1]=j*kx;
-      count++;
-    }
-  }
-  rCount = (n_max*2+1)*(n_max*2+1); // total number of real-space periodic images
-  rspace.resize(rCount); //real space
-  count = 0;
-  for (int i = -n_max; i <= n_max; ++i){
-    for (int j = -n_max; j <= n_max; ++j){
-      rspace[count].resize(2); // {0,0,0}
-      rspace[count][0]=i*sideLength;
-      rspace[count][1]=j*sideLength;
-      count++;
-    }
-  }
-
 }
 
 void Simbox::get_drpair0(){
@@ -173,11 +148,11 @@ void Simbox::get_drpair0(){
     if (charge[ind1] && charge[ind2]){ //if they both have charge
       for(int k = 0 ; k < 3 ; k++){
         dr[k]=position[ind1][k]-position[ind2][k];
-      // }
-        if(k<2){
-        	if(dr[k] > sideLength/2.) dr[k]-=sideLength;
-        	if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
-        }
+
+        // if(k<2){
+        // 	if(dr[k] > sideLength/2.) dr[k]-=sideLength;
+        // 	if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
+        // }
       }
     }else{ //otherwise they are "infinitely far apart"
       for(int k = 0 ; k < 3 ; k++){
