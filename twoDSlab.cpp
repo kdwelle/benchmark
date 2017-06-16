@@ -48,14 +48,15 @@ double get_mad_potential(const Simbox& config, int ionIndex){
       q=q2;
     }
     if(q){
-      x1 = config.drpair[i][0]; //non-periodic distance
-      y1 = config.drpair[i][1];
-      z1 = config.drpair[i][2];
+      x1 = config.drpair[pairIndex][0]; //non-periodic distance
+      y1 = config.drpair[pairIndex][1];
+      z1 = config.drpair[pairIndex][2];
       for (int img = 0; img < config.rCount; img++){ //loop over all periodic images
         dx = x1 + config.rspace[img][0];
         dy = y1 + config.rspace[img][1];
         r_ij = sqrt(dx*dx+dy*dy+z1*z1);
-        if(r_ij > 0){
+        if(r_ij > 0 && r_ij < config.rsCuttoff){
+          cout << "rij: " << r_ij << " ";
           ftemp=q*erfc(r_ij/alpha)/r_ij;
           rEnergy += ftemp;
         }
@@ -81,6 +82,8 @@ double get_mad_potential(const Simbox& config, int ionIndex){
   siEnergy = -2*q1/(alpha*sqrt(M_PI));
 
   pot = (ftEnergy+siEnergy+rEnergy)/config.gam;
+  cout << endl << "rEnergy: " << rEnergy << " siEnergy: " << siEnergy << " ftEnergy: " << ftEnergy << endl;
+  cout <<  ionIndex << " " << pot << endl;
   return pot; //*q1*0.5;
 }
 

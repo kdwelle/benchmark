@@ -15,7 +15,7 @@ using namespace std;
 Simbox::Simbox(int sideLength, int SLZ, int numImageReflections, string filename): sideLength(sideLength), SLZ(SLZ), numImageReflections(numImageReflections)
 {
   gam = 1;
-  rsCuttoff = 2*int(0.6*sideLength);
+  rsCuttoff = 2*0.6*max(sideLength,SLZ);
   zbegin = 0;
   zend = SLZ;
   readInput(filename);
@@ -173,11 +173,12 @@ void Simbox::get_drpair0(){
     if (charge[ind1] && charge[ind2]){ //if they both have charge
       for(int k = 0 ; k < 3 ; k++){
         dr[k]=position[ind1][k]-position[ind2][k];
-      }
-      //   if(k<2){
-      //   	if(dr[k] > sideLength/2.) dr[k]-=sideLength;
-      //   	if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
       // }
+        if(k<2){
+        	if(dr[k] > sideLength/2.) dr[k]-=sideLength;
+        	if(dr[k] < -sideLength/2.) dr[k]+=sideLength;
+        }
+      }
     }else{ //otherwise they are "infinitely far apart"
       for(int k = 0 ; k < 3 ; k++){
         dr[k] = inf;
