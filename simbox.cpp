@@ -25,7 +25,7 @@ Simbox::Simbox(int sideLength, int SLZ, int numImageReflections, string filename
 
 int Simbox::readInput(string filename){
   if (sideLength > 100){
-    cout << "place holder" << endl;
+    cout << "sideLength is greater than 100" << endl;
   }
 
   ifstream fin;

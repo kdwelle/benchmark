@@ -40,7 +40,7 @@ class Simbox{
     float  gam;
 
     double inf;                          // infinity
-    const static int   m_max = 17;       // cells in fourier space
+    const static int   m_max = 20;       // cells in fourier space
     const static int   n_max = 1;        // cells in real
     int                rCount;           // total number of real periodic images
     int                ftCount;          // total number of fourier space periodic images

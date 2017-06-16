@@ -1,10 +1,9 @@
 #include <math.h>
-#include <complex>
 
 using namespace std;
 double functionF(double,double,double);
 double alpha = 6.67; //constant for 2-D slab summation
-
+// double alpha = .43063;
 
 
 double get_energy(const Simbox& config){
@@ -25,19 +24,19 @@ double get_mad_potential(const Simbox& config, int ionIndex){
   double pot=0.0;
   double ftemp;
   float q,q1,q2;
-  int dx,dy;
-  int x1,y1,z1,pairIndex;
+  double dx,dy;
+  double x1,y1,z1;
+  int pairIndex;
 
   //Ewald Summation
-  double rEnergy = 0.0;
+  double rEnergy = 0.0;  // real-space energy
   double r_ij;
-  double siEnergy = 0.0;
+  double siEnergy = 0.0;  //self-interaction energy
   double cosTerm;
   double functionF;
   double functiong;
   double ftEnergy = 0.0;
   double h1,h2,h_2,h;
-  complex<double> dot;
 
   for (int i=0; i<config.numObjs; ++i){
     pairIndex = config.pairind2[ionIndex][i];
@@ -56,8 +55,8 @@ double get_mad_potential(const Simbox& config, int ionIndex){
         dx = x1 + config.rspace[img][0];
         dy = y1 + config.rspace[img][1];
         r_ij = sqrt(dx*dx+dy*dy+z1*z1);
-        if(r_ij < config.rsCuttoff && r_ij > 0){
-          ftemp=q*erfc(alpha*r_ij)/r_ij;
+        if(r_ij > 0){
+          ftemp=q*erfc(r_ij/alpha)/r_ij;
           rEnergy += ftemp;
         }
       }
@@ -67,23 +66,19 @@ double get_mad_potential(const Simbox& config, int ionIndex){
         h_2 = h1*h1+h2*h2;
         h=sqrt(h_2);
         if (h_2 > .00001){
-          cosTerm = cos(h1*x1+h2*y1);
-          functionF = exp(h*z1)*erfc(alpha*z1+(h/(2*alpha))) + exp(-1*h*z1)*erfc(-1*alpha*z1+(h/(2*alpha)));
-          functiong = z1*erfc(alpha*z1)+ exp(-1*(z1*alpha*z1*alpha))/(alpha*M_PI);
-          ftEnergy += q*M_PI/(config.sideLength*config.sideLength)*cosTerm*functionF-functiong;
+          cosTerm = cos((2*M_PI*h1*x1)+(2*M_PI*h2*y1))/(2*h);
+          functionF = exp(2*h*z1)*erfc(alpha*h+(z1/alpha)) + exp(-2*h*z1)*erfc(alpha*h-(z1/alpha));
+          ftemp = q*cosTerm*functionF/(config.sideLength*config.sideLength);
+          ftEnergy += ftemp;
         }
       }
+      functiong = z1*erf(z1/alpha) + alpha*exp(-1*(z1*z1)/(alpha*alpha))/sqrt(M_PI);
+      ftEnergy += -2*M_PI*q*functiong/(config.sideLength*config.sideLength);
     }
   }
 
-  for (int i=0; i<config.numObjs; ++i){
-    q1 = config.charge[i];
-    if(q1){
-      //SELF-INTERACTION
-      ftemp = -1*alpha/sqrt(M_PI)*q1*q1;
-      siEnergy += ftemp;
-    }
-  }
+  q1=config.charge[ionIndex];
+  siEnergy = -2*q1/(alpha*sqrt(M_PI));
 
   pot = (ftEnergy+siEnergy+rEnergy)/config.gam;
   return pot; //*q1*0.5;

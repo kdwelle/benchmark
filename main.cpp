@@ -1,6 +1,6 @@
 #include "simbox.cpp"
+// #include "noPeriodicity.cpp"
 #include "twoDSlab.cpp"
-#include "sweepLtR.cpp"
 
 
 int main(int argc, char *argv[]){
@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
 // Default parameters
   int sideLength = 10; // dimension in x and y dimension
   int SLZ = 10;        // distance between electrodes
-  int imageCharges = 1;
+  int imageCharges = 0;
 
   // float zend = 3.0*SLZ/2.0;
 
@@ -22,19 +22,19 @@ int main(int argc, char *argv[]){
 
   cout << "image charges: " << imageCharges << endl;
 
-  // float zbegin = 0;
+  float zbegin = 0;
 
   // Make a lattice object:
   Simbox sample(sideLength, SLZ, imageCharges, "input.in");
   cout << get_energy(sample) << endl;
 
   sample.output_analysis();
-  // for (int i=0; i<97; ++i){
-  //   double z = zbegin+0.2+(i*1.0/SLZ);
-  //   cout << z << " ";
-  //   sample.set_position(0,0,0,z);
-  //   cout << get_energy(sample) << endl;
-  // }
-  // sample.output_analysis();
+  for (int i=0; i<97; ++i){
+    double z = zbegin+0.2+(i*1.0/SLZ);
+    cout << z << " ";
+    sample.set_position(0,0,0,z);
+    cout << get_energy(sample) << endl;
+  }
+  sample.output_analysis();
 
 }
