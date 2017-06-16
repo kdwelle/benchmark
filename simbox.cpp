@@ -15,13 +15,19 @@ using namespace std;
 Simbox::Simbox(int sideLength, int SLZ, int numImageReflections, string filename): sideLength(sideLength), SLZ(SLZ), numImageReflections(numImageReflections)
 {
   gam = 1;
+  rsCuttoff = 2*int(0.6*sideLength);
   zbegin = 0;
   zend = SLZ;
   readInput(filename);
   initialize();
+
 }
 
 int Simbox::readInput(string filename){
+  if (sideLength > 100){
+    cout << "place holder" << endl;
+  }
+
   ifstream fin;
   fin.open(filename); // open a file
   if (!fin.good()){
@@ -45,7 +51,7 @@ int Simbox::readInput(string filename){
     fin.getline(buf, 100); // read an entire line into memory
     // parse the line into blank-delimited tokens
     int n = 0; // a for-loop index
-    int maxTokens = 5;
+    const int maxTokens = 5;
     const char* token[maxTokens] = {}; // array to store memory addresses of the tokens in buf
 
     // parse the line
@@ -130,6 +136,31 @@ void Simbox::initialize(){
   }
 
   get_drpair0();
+
+  //initialize the real and fourier space periodic image vectors
+  ftCount = (m_max*2+1)*(m_max*2+1); //total number of fourier space periodic images
+  fspace.resize(ftCount);  //fourier space
+  int count = 0;
+  double kx = 2*M_PI/double(sideLength); //lattice vector dimensions
+  for (int i = -m_max; i <= m_max; ++i){
+    for (int j = -m_max; j <= m_max; ++j){
+      fspace[count].resize(2); // {0,0,0}
+      fspace[count][0]=i*kx;
+      fspace[count][1]=j*kx;
+      count++;
+    }
+  }
+  rCount = (n_max*2+1)*(n_max*2+1); // total number of real-space periodic images
+  rspace.resize(rCount); //real space
+  count = 0;
+  for (int i = -n_max; i <= n_max; ++i){
+    for (int j = -n_max; j <= n_max; ++j){
+      rspace[count].resize(2); // {0,0,0}
+      rspace[count][0]=i*sideLength;
+      rspace[count][1]=j*sideLength;
+      count++;
+    }
+  }
 
 }
 

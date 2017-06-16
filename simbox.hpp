@@ -34,12 +34,18 @@ class Simbox{
     int    numImageReflections;  // how many image charges to include (0 is none, 1 is as many image charges as real charges)
     float  zbegin;
     float  zend;
-    int    numObjs;  // total number of objects in the simulation (including image charges)
-    int    numReal;  // total number of "real" (i.e. non-image) charge in the simulation
+    int    numObjs;              // total number of objects in the simulation (including image charges)
+    int    numReal;              // total number of "real" (i.e. non-image) charge in the simulation
     int    numPairs;
     float  gam;
 
-    double inf;              // infinity
+    double inf;                          // infinity
+    const static int   m_max = 17;       // cells in fourier space
+    const static int   n_max = 1;        // cells in real
+    int                rCount;           // total number of real periodic images
+    int                ftCount;          // total number of fourier space periodic images
+    // double             alpha;            // width of the gausian distribution for ewald summation
+    int                rsCuttoff;        // real space cutoff radius
 
 
     std::vector<int>                   realCharges; // a list of all the non-image charges in the syste, by index
@@ -48,6 +54,9 @@ class Simbox{
     std::vector< std::vector<double> > drpair;     // drpair[ionPairIndex][x/y/z] = 3-D distance between ions in ion pair
     std::vector< std::vector<int> >    pairind;    // pairind[ionPairIndex][0/1] = index of 1st/2nd ion in pair
     std::vector< std::vector<int> >    pairind2;   // pairind2[ionIndex 1][ionIndex 2] = ionPairIndex
+
+    std::vector< std::vector<float> >  fspace;           //reciprical (fourier) space repeating images
+    std::vector< std::vector<int> >    rspace;           //real space repeating images
 
 };
 
