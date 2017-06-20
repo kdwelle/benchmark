@@ -1,8 +1,8 @@
 #include "periodicImages.cpp"
 #include "simbox.cpp"
 // #include "noPeriodicity.cpp"
-// #include "twoDSlab.cpp"
-#include "ewald.cpp"
+#include "twoDSlab.cpp"
+// #include "ewald.cpp"
 
 
 int main(int argc, char *argv[]){

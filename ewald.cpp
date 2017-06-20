@@ -34,7 +34,7 @@ double get_mad_potential(const Simbox& config, int ionIndex, const PeriodicImage
   double siEnergy = 0.0; //self-interaction energy
 
   // REAL SPACE Part
-  for (int i=0; i<config.numObjs; ++i){ //sum over all ions except ionIndex (not including own periodic images)
+  for (int i=0; i<config.numObjs; ++i){ //sum over all ions
     pairIndex = config.pairind2[ionIndex][i];
     q1=config.charge[config.pairind[pairIndex][0]]; //0 index is smaller index than 1 index
     q2=config.charge[config.pairind[pairIndex][1]]; //charge of the ions
@@ -60,22 +60,9 @@ double get_mad_potential(const Simbox& config, int ionIndex, const PeriodicImage
     }
   }
 
-  // Interactions with self in periodic images
   q1 = config.charge[ionIndex];
   if(q1){ //only need to run if q1 has charge
-    siEnergy = -sqrt(alpha/M_PI)*q1*2;  //self-interaction term here for efficiency
-    // End self-interaction term
-
-    for (int img = 0; img < imageItem.rCount; img++){ //loop over all real-space periodic images
-      dx = imageItem.rspace[img][0];
-      dy = imageItem.rspace[img][1];
-      dz = imageItem.rspace[img][2];
-      if (dx != 0 || dy != 0 || dz != 0){ //don't want dist = 0 interaction
-        r_ij = sqrt(dx*dx+dy*dy+dz*dz);
-        ftemp=q1*erfc(sqrt(alpha)*r_ij)/r_ij;
-        rEnergy += ftemp;
-      }
-    }
+    siEnergy = -sqrt(alpha/M_PI)*q1*2;  //self-interaction term
   }
 
   //FOURIER SPACE Part
@@ -102,9 +89,9 @@ double get_mad_potential(const Simbox& config, int ionIndex, const PeriodicImage
       }
     }
   }
-  ftEnergy = ftEnergy/(SideLength*SideLength*SideLength); //factor of 1/V
+  ftEnergy = ftEnergy/(config.sideLength*config.sideLength*config.sideLength); //factor of 1/V
 
-  pot = (ftEnergy+siEnergy+rEnergy)/gam;
+  pot = (ftEnergy+siEnergy+rEnergy)/config.gam;
   return pot; //*q1*0.5;
 }
 

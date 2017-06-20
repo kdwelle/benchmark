@@ -1,8 +1,8 @@
 #include <math.h>
 
 using namespace std;
-// double alpha = 6.67; //constant for 2-D slab summation
-double alpha = 1000;
+double alpha = 6.67; //constant for 2-D slab summation
+// double alpha = 1000;
 
 
 double get_energy(const Simbox& config, const PeriodicImages& imageItem){
