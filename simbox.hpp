@@ -21,7 +21,6 @@ class Simbox{
     friend double get_energy(const Simbox&, const PeriodicImages&);
     friend double get_mad_potential(const Simbox&, int, const PeriodicImages&);
 
-  private:
     int   readInput(std::string);
     void  initialize();
     void  get_drpair0();

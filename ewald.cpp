@@ -17,6 +17,63 @@ double get_energy(const Simbox& config, const PeriodicImages& imageItem){
   return eng/2;
 }
 
+double get_potential(const Simbox& config, const PeriodicImages& imageItem, double x, double y, double z){
+  // get the poisson potential at a point in the box
+  double alpha = 3.2/config.rsCuttoff;
+  double pot=0.0;
+  double ftemp;
+  float q;
+  double dx,dy,dz;
+  double x1,y1,z1;
+  //Ewald Summation
+  double rEnergy = 0.0; //real-space energy
+  double r_ij;
+  double siEnergy = 0.0; //self-interaction energy
+  //Fourier-Space
+  complex<double> rho;
+  double ftEnergy = 0.0;
+  double k1,k2,k3,k_2;
+  complex<double> dot;
+
+  for (int i=0; i<config.numObjs; ++i){ //loop over all ions
+    q = config.charge[i];
+    if (q){
+      x1 = config.position[i][0] - x;
+      y1 = config.position[i][1] - y;
+      z1 = config.position[i][2] - z;
+      //Real-space
+      for (int img = 0; img < imageItem.rCount; img++){ //loop over all periodic images
+        dx = x1 + imageItem.rspace[img][0];
+        dy = y1 + imageItem.rspace[img][1];
+        dz = z1 + imageItem.rspace[img][2];
+        r_ij = sqrt(dx*dx+dy*dy+dz*dz);
+        if(r_ij > 0 && r_ij < config.rsCuttoff){
+          ftemp=q*erfc(sqrt(alpha)*r_ij)/r_ij;
+          rEnergy += ftemp;
+        }
+      }
+      //self-interation
+      siEnergy = -sqrt(alpha/M_PI)*q*2;  //self-interaction term
+      //Fourier-space
+      for (int img = 0; img < imageItem.ftCount; img++){ //loop over all periodic images
+        k1=imageItem.fspace[img][0];
+        k2=imageItem.fspace[img][1];
+        k3=imageItem.fspace[img][2];
+        k_2 = k1*k1+k2*k2+k3*k3; //k^2
+        if (k_2 > .000001){
+          rho = complex<double>(0.0,0.0);
+          dot = complex<double>(0.0,(k1*x1)+(k2*y1)+(k3*z1)); //r_ij dot ik
+          rho = exp(dot);
+          ftemp = 4*M_PI*q/k_2*real(rho)*exp(-k_2/(4*alpha));
+          ftEnergy += ftemp;
+        }
+      }
+      ftEnergy = ftEnergy/(config.sideLength*config.sideLength*config.sideLength); //factor of 1/V
+    }
+    pot = pot + (ftEnergy+siEnergy+rEnergy)/config.gam;
+  }
+  return pot;
+}
 
 double get_mad_potential(const Simbox& config, int ionIndex, const PeriodicImages& imageItem){
   //gets the madeleung potential of an ion
