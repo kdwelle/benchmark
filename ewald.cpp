@@ -68,7 +68,7 @@ double get_potential(const Simbox& config, const PeriodicImages& imageItem, doub
           ftEnergy += ftemp;
         }
       }
-      ftEnergy = ftEnergy/(config.sideLength*config.sideLength*config.sideLength); //factor of 1/V
+      ftEnergy = ftEnergy/(config.SLX*config.SLY*config.SLZ); //factor of 1/V
     }
     pot = pot + (ftEnergy+siEnergy+rEnergy)/config.gam;
   }
@@ -146,16 +146,16 @@ double get_mad_potential(const Simbox& config, int ionIndex, const PeriodicImage
       }
     }
   }
-  ftEnergy = ftEnergy/(config.sideLength*config.sideLength*config.sideLength); //factor of 1/V
+  ftEnergy = ftEnergy/(config.SLX*config.SLY*config.SLZ); //factor of 1/V
 
   pot = (ftEnergy+siEnergy+rEnergy)/config.gam;
   return pot; //*q1*0.5;
 }
 
-PeriodicImages get_images(double sideLength, double SLZ){
+PeriodicImages get_images(double SLX, double SLY, double SLZ){
   int dimen = 3;  // this is a 3D ewald code so 3 dimensions
-  int n_max = 1;  // only need one real image
+  int n_max = 2;  // only need one real image
   int m_max = 5; // seems like 3D slab converges around 5 k-space images
-  PeriodicImages imageItem(dimen,n_max,m_max,sideLength,SLZ);
+  PeriodicImages imageItem(dimen,n_max,m_max,SLX,SLY,SLZ);
   return imageItem;
 }

@@ -11,7 +11,7 @@ class Simbox{
    variablesUseCamelCase
 */
   public:
-    Simbox(int, int, int, std::string);
+    Simbox(double, double, double, int, std::string);
     void translate_particle(int, float, float, float); //move particle by x,y,z
     void set_position(int, float, float, float);
     void change_charge(int,float);
@@ -28,8 +28,9 @@ class Simbox{
     float get_image(float,int);
     float get_image_charge(float,int);
 
-    int    sideLength;
-    int    SLZ;
+    double SLX;
+    double SLY;
+    double SLZ;
     int    numImageReflections;  // how many image charges to include (0 is none, 1 is as many image charges as real charges)
     float  zbegin;
     float  zend;

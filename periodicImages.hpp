@@ -7,7 +7,7 @@ images used to calculate various flavors of Ewald summations
 */
 
   public:
-    PeriodicImages(int,int,int,double,double);
+    PeriodicImages(int,int,int,double,double,double);
     void initialize2D();
     void initialize3D();
 
@@ -21,7 +21,8 @@ images used to calculate various flavors of Ewald summations
   private:
     int n_max;           // cells in real space
     int m_max;           // cells in fourier space
-    double sideLength;
+    double SLX;
+    double SLY;
     double SLZ;          // dimension normal to elecrodes; =0 for 2D-slab in which case leave default
 };
 

@@ -12,10 +12,10 @@
 using namespace std;
 
 
-Simbox::Simbox(int sideLength, int SLZ, int numImageReflections, string filename): sideLength(sideLength), SLZ(SLZ), numImageReflections(numImageReflections)
+Simbox::Simbox(double SLX, double SLY, double SLZ, int numImageReflections, string filename): SLX(SLX), SLY(SLY), SLZ(SLZ), numImageReflections(numImageReflections)
 {
   gam = 1;
-  rsCuttoff = 0.6*max(sideLength,SLZ);
+  rsCuttoff = 0.6*max(SLX,SLZ);
   zbegin = 0;
   zend = SLZ;
   readInput(filename);
@@ -24,10 +24,6 @@ Simbox::Simbox(int sideLength, int SLZ, int numImageReflections, string filename
 }
 
 int Simbox::readInput(string filename){
-  if (sideLength > 100){
-    cout << "sideLength is greater than 100" << endl;
-  }
-
   ifstream fin;
   fin.open(filename); // open a file
   if (!fin.good()){
@@ -51,7 +47,7 @@ int Simbox::readInput(string filename){
     fin.getline(buf, 100); // read an entire line into memory
     // parse the line into blank-delimited tokens
     int n = 0; // a for-loop index
-    const int maxTokens = 5;
+    const int maxTokens = 7;
     const char* token[maxTokens] = {}; // array to store memory addresses of the tokens in buf
 
     // parse the line
@@ -63,20 +59,20 @@ int Simbox::readInput(string filename){
         if (!token[n]) break; // no more tokens
       }
 
-      position[objIndex][0] = atof(token[1]);  // x-position
-      position[objIndex][1] = atof(token[2]);  // y-position
-      position[objIndex][2] = atof(token[3]) + zbegin;  // z-position
-      charge[objIndex] = atof(token[4]);       //charge
+      position[objIndex][0] = atof(token[3]);  // x-position
+      position[objIndex][1] = atof(token[4]);  // y-position
+      position[objIndex][2] = atof(token[5]) + zbegin;  // z-position
+      charge[objIndex] = atof(token[2]);       //charge
 
       realCharges.push_back(objIndex); //this is a real charge, add to list;
 
       objIndex++;
 
       for (int i=0; i<numImageReflections; ++i){
-        position[objIndex][0] = atof(token[1]);  // x-position
-        position[objIndex][1] = atof(token[2]);  // y-position
-        position[objIndex][2] = get_image(atof(token[3]) + zbegin, i+1);  // z-position
-        charge[objIndex] = get_image_charge(atof(token[4]), i+1);       //charge
+        position[objIndex][0] = atof(token[3]);  // x-position
+        position[objIndex][1] = atof(token[4]);  // y-position
+        position[objIndex][2] = get_image(atof(token[5]) + zbegin, i+1);  // z-position
+        charge[objIndex] = get_image_charge(atof(token[2]), i+1);       //charge
         objIndex++;
       }
     }

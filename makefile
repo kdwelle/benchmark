@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -v -Wall -Wextra -Werror -g
+CFLAGS = -O3 -v -Wall -Wextra -Werror -g
 OBJECTS = main.o
 
 lattice : $(OBJECTS)
