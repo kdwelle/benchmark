@@ -37,10 +37,14 @@ double get_potential(const Simbox& config, const PeriodicImages& imageItem, doub
 
   for (int i=0; i<config.numObjs; ++i){ //loop over all ions
     q = config.charge[i];
+    ftEnergy = 0;
+    siEnergy = 0;
+    ftEnergy = 0;
     if (q){
       x1 = config.position[i][0] - x;
       y1 = config.position[i][1] - y;
       z1 = config.position[i][2] - z;
+      
       //Real-space
       for (int img = 0; img < imageItem.rCount; img++){ //loop over all periodic images
         dx = x1 + imageItem.rspace[img][0];
@@ -52,8 +56,10 @@ double get_potential(const Simbox& config, const PeriodicImages& imageItem, doub
           rEnergy += ftemp;
         }
       }
+      
       //self-interation
       siEnergy = -sqrt(alpha/M_PI)*q*2;  //self-interaction term
+      
       //Fourier-space
       for (int img = 0; img < imageItem.ftCount; img++){ //loop over all periodic images
         k1=imageItem.fspace[img][0];

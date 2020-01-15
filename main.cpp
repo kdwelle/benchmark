@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
 
 
   // Make a lattice object:
-  Simbox sample(SLX,SLY,SLZ, imageCharges, "input.in2");
+  Simbox sample(SLX,SLY,SLZ, imageCharges, "input.in5");
   cout << "simbox loaded" << endl;
   // and an image vector object:
   PeriodicImages imageItem = get_images(SLX,SLY,SLZ);
