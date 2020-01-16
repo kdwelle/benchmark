@@ -18,8 +18,11 @@ Simbox::Simbox(double SLX, double SLY, double SLZ, int numImageReflections, stri
   rsCuttoff = 0.6*max(SLX,SLZ);
   zbegin = 0;
   zend = SLZ;
-  readInput(filename);
-  initialize();
+  int status = readInput(filename);
+  if (status == 0){
+    initialize();
+  }
+  
 
 }
 
@@ -27,6 +30,7 @@ int Simbox::readInput(string filename){
   ifstream fin;
   fin.open(filename); // open a file
   if (!fin.good()){
+    cout << "file not found" << endl;
     return 1; // exit if file not found
   }
   //read first line (how many real objects)
@@ -93,7 +97,9 @@ int Simbox::readInput(string filename){
     return 0; //whee everythig's good
   }
   else{
+    cout << "mismatch between number of objects declared and read in" << endl;
     return 2; //mismatch between declared number of objects and actual number
+    
   }
 
 }
